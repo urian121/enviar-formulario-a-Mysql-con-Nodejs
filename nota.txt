@@ -1,0 +1,9 @@
+npm install express
+npm install ejs
+npm i cors
+npm install --save mysql2
+
+
+A partir de la versión 4.16.0 de Express, el middleware body-parser se incluye en el propio Express, 
+por lo que no es necesario instalarlo por separado. Puedes eliminar
+la línea const bodyParser = require("body-parser");.
