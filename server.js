@@ -3,12 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+//Importando la conexion a BD
 const connection = require("./configBD");
-
-/**
- * Definiendo el puerto de nuestro Servidor
- */
-const PORT = process.env.PORT || 3001;
 
 //Creando una nueva aplicación Express.
 const app = express();
@@ -30,6 +26,7 @@ const path = require("path");
  * no datos complejos como matrices o objetos anidados.
  */
 app.use(cors());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 /**
@@ -45,31 +42,69 @@ app.use("/public", express.static(path.join(__dirname, "public")));
  * para configurar variables de entorno, ajustes específicos de la aplicación o valores personalizados.
  */
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "src/views"));
+app.set("views", path.join(__dirname, "views"));
 
 /**
  * Definiendo mi ruta Home
  */
 app.get("/", (req, res) => {
-  res.render("inicio");
+  res.render("inicio", {
+    rutaActual: "/",
+  });
 });
 
-// Ruta de about
-app.get("/form", (req, res) => {
-  res.render("pages/form");
+const infoUsuario = {
+  nombre: "urian",
+  apellido: "Viera",
+  profesion: "Developer",
+  admin: true,
+};
+
+app.get("/informacion", (req, res) => {
+  res.render("pages/informacion", {
+    infoUsuario,
+    rutaActual: "/informacion",
+  });
 });
 
-app.post("/enviar", async (req, res) => {
-  console.log(req.body);
+let variable_lenguaje = "NodeJS";
+app.get("/perfil", (req, res) => {
+  res.render("pages/perfil", {
+    rutaActual: "/perfil",
+    variable_lenguaje,
+  });
+});
+
+/**
+ * PROCESANDO FORMULARIO
+ * el módulo mysql2 y hace uso de promesas y async/await para realizar la inserción en la base de datos.
+ *  Esto permite un código más legible y fácil de mantener.
+ *  Además, mysql2 es una biblioteca más moderna y eficiente para interactuar con MySQL en comparación con el módulo mysql.
+ */
+app.post("/procesar-formulario", async (req, res) => {
   /**
    * Desestructuración de los datos del body
    */
-  const { nombre, email } = req.body;
+  console.log(req.body);
+  // Verificar campos vacíos
+  for (const campo in req.body) {
+    if (!req.body[campo]) {
+      res.send(`Error: El campo ${campo} está vacío.`);
+      return;
+    }
+  }
+
+  const { nombre_alumno, email_alumno, curso_alumno } = req.body;
   try {
     // Realizar la inserción en la base de datos
-    const query = "INSERT INTO alumnos (nombre, email) VALUES (?, ?)";
-    await connection.execute(query, [nombre, email]);
-
+    const query =
+      "INSERT INTO estudiantes (nombre_alumno, email_alumno, curso_alumno, created_at) VALUES (?, ?, ?, ?)";
+    await connection.execute(query, [
+      nombre_alumno,
+      email_alumno,
+      curso_alumno,
+      new Date(),
+    ]);
     res.send(`¡Formulario procesado correctamente!`);
   } catch (error) {
     console.error("Error al insertar en la base de datos: ", error);
@@ -78,33 +113,94 @@ app.post("/enviar", async (req, res) => {
   }
 });
 
-/**
- * Procesando formulario
- */
-app.post("/enviar2", (req, res) => {
+app.post("/procesar-formulario3", async (req, res) => {
   console.log(req.body);
-  /**
-   * Desestructuración de los datos del body
-   */
-  const { nombre, email } = req.body;
-  console.log(nombre, email);
+  const { nombre_alumno, email_alumno, curso_alumno } = req.body;
+  try {
+    const query =
+      "INSERT INTO estudiantes (nombre_alumno, email_alumno, curso_alumno, created_at) VALUES (?, ?, ?,?)";
+    connection.query(
+      query,
+      [nombre_alumno, email_alumno, curso_alumno, new Date()],
+      (error, result) => {
+        if (error) {
+          console.error("Error al insertar en la base de datos: ", error);
+          res.send("Error al procesar el formulario");
+          return;
+        }
 
-  const query = "INSERT INTO alumnos (nombre, email) VALUES (?, ?)";
-  connection.query(query, [nombre, email], (error, results, fields) => {
-    if (error) {
-      console.error("Error al insertar en la base de datos: ", error);
-      res.send("Error al procesar el formulario");
-      return;
+        if (result && result.affectedRows > 0) {
+          res.send("¡Formulario procesado correctamente!");
+        } else {
+          res.send("Error al procesar el formulario");
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error al insertar en la base de datos: ", error);
+    res.send("Error al procesar el formulario");
+  }
+});
+
+/**
+ * Insert segunda forma
+ */
+app.post("/procesar-formulario2", (req, res) => {
+  console.log(req.body);
+  const { nombre_alumno, email_alumno, curso_alumno } = req.body;
+  const query =
+    "INSERT INTO estudiantes (nombre_alumno, email_alumno, curso_alumno, created_at) VALUES (?, ?, ?, ?)";
+
+  connection.query(
+    query,
+    [nombre_alumno, email_alumno, curso_alumno, new Date()],
+    (error, result) => {
+      if (error) {
+        console.error("Error al insertar en la base de datos: ", error);
+        res.send("Error al procesar el formulario");
+        return;
+      }
+
+      if (result && result.affectedRows > 0) {
+        res.send("¡Formulario procesado correctamente!");
+      } else {
+        res.send("Error al procesar el formulario");
+      }
     }
-    console.log(error);
-    console.log(results);
-    console.log(fields);
+  );
+});
 
-    res.send(`¡Formulario procesado correctamente!.`);
+app.get("/estudiante", (req, res) => {
+  connection.query("SELECT * FROM estudiantes", (err, rows, fields) => {
+    if (!err) res.send(rows);
+    else console.log(err);
   });
 });
 
-// Iniciar el servidor
+app.get("/estudiantes/:id", (req, res) => {
+  connection.query(
+    "SELECT * FROM estudiantes WHERE id_estudiante =?",
+    [req.params.id],
+    (err, rows, fields) => {
+      if (!err) res.send(rows);
+      else console.log(err);
+    }
+  );
+});
+
+app.delete("/estudiante/:id", (req, res) => {
+  connection.query(
+    "DELETE FROM estudiantes WHERE id_estudiante=?",
+    [req.params.id],
+    (err, rows, fields) => {
+      if (!err) res.send("Record deleted successfully.");
+      else res.send(err);
+    }
+  );
+});
+
+// Iniciar el servidor con Express
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });

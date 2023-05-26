@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('../includes/head') %>
+  </head>
+  <body>
+    <%- include('../includes/header') %>
+
+    <main class="content-wrapper mt-5" style="margin-top: 80px !important">
+      <div class="container" style="width: 95% !important">
+        <div class="row justify-content-md-center mb-5">
+          <div class="col-md-12 mt-5">
+            <h2 class="text-center">Estoy en la página de Información</h2>
+          </div>
+
+          <p style="text-align: center">
+            Cuando es un Objeto puedes acceder a las propiedades del mismo de
+            esta forma <code>infoUsuario.nombre</code>
+          </p>
+
+          <h4><%= infoUsuario.nombre %></h4>
+
+          <div class="col-md-12 mt-5 text-center">
+            <img
+              class="img-fluid"
+              src="./public-resource/imgs/nodejs.png"
+              alt="WeB Developer - urian V" />
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('../includes/scripts') %>
+  </body>
+</html>
