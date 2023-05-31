@@ -53,25 +53,9 @@ app.get("/", (req, res) => {
   });
 });
 
-const infoUsuario = {
-  nombre: "urian",
-  apellido: "Viera",
-  profesion: "Developer",
-  admin: true,
-};
-
-app.get("/informacion", (req, res) => {
-  res.render("pages/informacion", {
-    infoUsuario,
-    rutaActual: "/informacion",
-  });
-});
-
-let variable_lenguaje = "NodeJS";
-app.get("/perfil", (req, res) => {
-  res.render("pages/perfil", {
-    rutaActual: "/perfil",
-    variable_lenguaje,
+app.get("/form-estudiante", (req, res) => {
+  res.render("pages/form", {
+    rutaActual: "/form-estudiante",
   });
 });
 
@@ -170,37 +154,8 @@ app.post("/procesar-formulario2", (req, res) => {
   );
 });
 
-app.get("/estudiante", (req, res) => {
-  connection.query("SELECT * FROM estudiantes", (err, rows, fields) => {
-    if (!err) res.send(rows);
-    else console.log(err);
-  });
-});
-
-app.get("/estudiantes/:id", (req, res) => {
-  connection.query(
-    "SELECT * FROM estudiantes WHERE id_estudiante =?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) res.send(rows);
-      else console.log(err);
-    }
-  );
-});
-
-app.delete("/estudiante/:id", (req, res) => {
-  connection.query(
-    "DELETE FROM estudiantes WHERE id_estudiante=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) res.send("Record deleted successfully.");
-      else res.send(err);
-    }
-  );
-});
-
 // Iniciar el servidor con Express
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
