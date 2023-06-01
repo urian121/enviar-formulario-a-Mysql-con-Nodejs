@@ -1,4 +1,4 @@
-## Enviar datos de un formulario HTML a una base de datos MySQL usando Node.js 😲
+## Enviar datos de un formulario HTML a una base de datos MySQL con Node.js 😲
 
 ###### Este proyecto trata de como poder enviar un formualrio HTML al gestor de BD MySQL usando express como servidor y ejs como motor de plantilla para express.
 
