@@ -12,9 +12,7 @@ const path = require("path");
 
 /**
  * app.use(cors()): Es un middleware, al utilizar app.use(cors()),
- * estás permitiendo que tu servidor responda a las solicitudes de otros dominios,
- * lo que es útil cuando estás construyendo una API o cuando tu frontend se encuentra
- * en un dominio diferente al backend.
+ * estás permitiendo que tu servidor responda a las solicitudes de otros dominios.
  
  * app.use(bodyParser.urlencoded({ extended: false })): habilita el middleware de body-parser para analizar los datos enviados
  * en el cuerpo de las solicitudes HTTP.
@@ -92,6 +90,9 @@ app.post("/procesar-formulario", async (req, res) => {
       rutaActual: "/",
     });
     //res.send(`¡Formulario procesado correctamente!`);
+
+    // Cerrar la conexión después de ejecutar la consulta
+    connection.end();
   } catch (error) {
     console.error("Error al insertar en la base de datos: ", error);
     console.log(error); // Agregar esta línea para imprimir el error completo en la consola
@@ -103,31 +104,6 @@ app.post("/procesar-formulario", async (req, res) => {
  * Insert segunda forma
  */
 app.post("/procesar-formulario2", (req, res) => {
-  console.log(req.body);
-  const { nombre_alumno, email_alumno, curso_alumno } = req.body;
-  const query =
-    "INSERT INTO estudiantes (nombre_alumno, email_alumno, curso_alumno, created_at) VALUES (?, ?, ?, ?)";
-
-  connection.query(
-    query,
-    [nombre_alumno, email_alumno, curso_alumno, new Date()],
-    (error, result) => {
-      if (error) {
-        console.error("Error al insertar en la base de datos: ", error);
-        res.send("Error al procesar el formulario");
-        return;
-      }
-
-      if (result && result.affectedRows > 0) {
-        res.send("¡Formulario procesado correctamente!");
-      } else {
-        res.send("Error al procesar el formulario");
-      }
-    }
-  );
-});
-
-app.post("/procesar-formulario3", async (req, res) => {
   console.log(req.body);
   const { nombre_alumno, email_alumno, curso_alumno } = req.body;
   try {
@@ -148,6 +124,9 @@ app.post("/procesar-formulario3", async (req, res) => {
         } else {
           res.send("Error al procesar el formulario");
         }
+
+        // Cerrar la conexión después de ejecutar todas las consultas
+        connection.end();
       }
     );
   } catch (error) {
