@@ -90,9 +90,6 @@ app.post("/procesar-formulario", async (req, res) => {
       rutaActual: "/",
     });
     //res.send(`¡Formulario procesado correctamente!`);
-
-    // Cerrar la conexión después de ejecutar la consulta
-    connection.end();
   } catch (error) {
     console.error("Error al insertar en la base de datos: ", error);
     console.log(error); // Agregar esta línea para imprimir el error completo en la consola
@@ -124,9 +121,6 @@ app.post("/procesar-formulario2", (req, res) => {
         } else {
           res.send("Error al procesar el formulario");
         }
-
-        // Cerrar la conexión después de ejecutar todas las consultas
-        connection.end();
       }
     );
   } catch (error) {
