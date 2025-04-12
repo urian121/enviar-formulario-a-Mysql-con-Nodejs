@@ -4,11 +4,13 @@
 
 #### Paso para inicial el proyecto en NodeJS
 
-`npm init -y`
-`npm install express --save`
-`npm i ejs`
-`npm i cors`
-`npm install --save mysql2`
+```
+npm init -y
+npm install express --save
+npm i ejs
+npm i cors
+npm install --save mysql2
+```
 
 ## Para correr proyecto existente;
 
